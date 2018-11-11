@@ -4,3 +4,7 @@ pyopenssl
 ndg-httpsclient
 pyasn1
 pyaml
+nltk
+thesaurus
+textblob
+twilio
