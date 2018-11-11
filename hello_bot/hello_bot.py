@@ -4,12 +4,15 @@
 # 3rd party imports ------------------------------------------------------------
 from flask import Flask, request
 from webexteamssdk import WebexTeamsAPI, Webhook
+from thesaurus import Word
 
 # local imports ----------------------------------------------------------------
 from helpers import (read_yaml_data,
                      get_ngrok_url,
                      find_webhook_by_name,
                      delete_webhook, create_webhook)
+
+
 
 
 flask_app = Flask(__name__)
@@ -40,10 +43,42 @@ def teamswebhook():
         # Message was sent by the bot, do not respond.
         # At the moment there is no way to filter this out, there will be in the future
         me = teams_api.people.me()
+        msg = message.__getattr__('text')
+        
+        if(len(msg) > 0): #checking if the msg is not one word, so that errors is not run BTS
+          statement = msg.split()
+          w = Word(statement[1])
+
         if message.personId == me.id:
             return 'OK'
+        elif statement[0] == 'synonym': #for synonyms, just loop through the list
+            if len(w.synonyms()) == 0:
+              teams_api.messages.create(room.id, text='sorry, there are no results of it')
+            else:
+              teams_api.messages.create(room.id, text='The top synonyms of '+ statement[1]+' are ')
+              for x in (w.synonyms())[:3]: #limit to top 3
+                teams_api.messages.create(room.id, text=x)
+        elif statement[0] == 'antonym': #same as synonyms
+            if len(w.antonyms()) == 0:
+              teams_api.messages.create(room.id, text='sorry, there are no results of it')
+            else:
+              teams_api.messages.create(room.id, text='The top antonyms of '+ statement[1]+' are ')
+              for x in (w.antonyms())[:3]:
+                teams_api.messages.create(room.id, text=x)
+        elif statement[0] == 'origin': #list the origin, its a string
+            if w.origin() == "":
+              teams_api.messages.create(room.id, text='Cannot find origin of ' + statement[1])
+            else:
+              teams_api.messages.create(room.id, text=w.origin())
+        elif statement[0] == 'examples': # example sentences, another list
+            if len(w.examples()) == 0:
+              teams_api.messages.create(room.id, text='sorry, there are no results of it')
+            else:
+              teams_api.messages.create(room.id, text='Examples of '+ statement[1]+' in a sentence are ')
+              for x in (w.examples())[:3]:
+                teams_api.messages.create(room.id, text=x)
         else:
-            teams_api.messages.create(room.id, text='hello, person who has email '+str(email))
+            teams_api.messages.create(room.id, text='hello, you are the amazing guy who has email '+str(email))
     else:
         print('received none post request, not handled!')
 
