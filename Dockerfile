@@ -1,5 +1,5 @@
-FROM ubuntu:16.04
-RUN apt-get -y update \
+FROM ubuntu:16.04 
+RUN apt-get -y update \ 
     && apt-get -y install --no-install-recommends \
     build-essential \
     python3-dev \
@@ -15,7 +15,6 @@ RUN pip3 install --upgrade pip setuptools \
     && ln -sf /usr/bin/python3 /usr/bin/python
 COPY requirements.txt /tmp/requirements.txt
 RUN pip install -r /tmp/requirements.txt
-RUN python -m pip install duckduckpy
 COPY webexteamssdk /webexteamssdk
 RUN pip install /webexteamssdk
 ADD https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-linux-amd64.zip /tmp/ngrok.zip

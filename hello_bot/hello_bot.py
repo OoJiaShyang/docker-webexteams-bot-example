@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 #  -*- coding: utf-8 -*-
-from duckduckpy import query
 
 # 3rd party imports ------------------------------------------------------------
 from flask import Flask, request
@@ -41,22 +40,10 @@ def teamswebhook():
         # Message was sent by the bot, do not respond.
         # At the moment there is no way to filter this out, there will be in the future
         me = teams_api.people.me()
-        searchterm = message.text
-
-        # Check message length to avoid array out of bounds
-        # if len(searchterm) > 11):
-        #     if searchterm[:len("Kalah duck ")] == "Kalah duck ":
-        searchterm = searchterm[(len("Kalah ")-1):]
-        answer = query(searchterm)
-        teams_api.messages.create(room.id, text=answer.abstract)
-        # else:
-        #     teams_api.messages.create(room.id, text="Search term too short that's what she said.")
-
-        #
-        # if message.personId == me.id:
-        #     return 'OK'
-        # else:
-        #     teams_api.messages.create(room.id, text=searchterm +str(email))
+        if message.personId == me.id:
+            return 'OK'
+        else:
+            teams_api.messages.create(room.id, text='hello, person who has email '+str(email))
     else:
         print('received none post request, not handled!')
 
